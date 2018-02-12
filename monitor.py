@@ -12,24 +12,47 @@ import subprocess
 import sys
 import configparser
 from daemon import Daemon
+
+import uuid
+
 api_server = "http://192.168.1.161:8000"
 sensor_id = "http://127.0.0.1:8000/api/sensors/1dbe5bb9-6ee6-46a1-86c7-cfdf274033a4/"
 
 def get_i2c_sensors():
     p = subprocess.Popen(['i2cdetect', '-y', '1'], stdout=subprocess.PIPE, )
-    # cmdout = str(p.communicate())
+    firstLine = True
+    sensor_addresses = []
 
-    for i in range(0, 9):
-        line = str(p.stdout.readline())
-        print(line)
+    for i in range(1, 9):
+        if firstLine:
+            line = str(p.stdout.readline()).strip()
+            firstLine = False
+        else:
+            line = str(p.stdout.readline()).strip()
+            #print line
+            entry = line.split(" ")
+            entry = entry[1:]
+            for each in entry:
+                if (each != "") and (each != "--"):
+                    #print(each)
+                    sensor_addresses.append("0x%s" % each)
+    for sensor in sensor_addresses:
+        print("Found Sensor: %s" % sensor)
+
 
 class Monitor(Daemon):
 
-    def first_run(self):
-        pass
+    def generate_device_id(self):
+        self.device_id = uuid.uuid4()
+
+    def initialize(self):
+        self.generate_device_id()
+
+
 
     def run(self):
-        get_i2c_sensors()
+        while True:
+            print("hello")
 
 # while True:
 #     pass
@@ -70,7 +93,7 @@ class Monitor(Daemon):
 
 
 if __name__ == "__main__":
-        daemon = Monitor('/tmp/daemon-example.pid')
+        daemon = Monitor('homesense.pid')
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
                         daemon.start()
