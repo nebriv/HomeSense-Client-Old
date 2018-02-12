@@ -9,6 +9,8 @@ import time
 import datetime
 import requests
 import subprocess
+import sys
+import configparser
 from daemon import Daemon
 api_server = "http://192.168.1.161:8000"
 sensor_id = "http://127.0.0.1:8000/api/sensors/1dbe5bb9-6ee6-46a1-86c7-cfdf274033a4/"
@@ -22,6 +24,10 @@ def get_i2c_sensors():
         print(line)
 
 class Monitor(Daemon):
+
+    def first_run(self):
+        pass
+
     def run(self):
         get_i2c_sensors()
 
@@ -61,3 +67,21 @@ class Monitor(Daemon):
 #     #         print r.text
 #
 #     time.sleep(600)
+
+
+if __name__ == "__main__":
+        daemon = Monitor('/tmp/daemon-example.pid')
+        if len(sys.argv) == 2:
+                if 'start' == sys.argv[1]:
+                        daemon.start()
+                elif 'stop' == sys.argv[1]:
+                        daemon.stop()
+                elif 'restart' == sys.argv[1]:
+                        daemon.restart()
+                else:
+                        print("Unknown command")
+                        sys.exit(2)
+                sys.exit(0)
+        else:
+                print("usage: %s start|stop|restart" % sys.argv[0])
+                sys.exit(2)
