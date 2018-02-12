@@ -12,6 +12,7 @@ import subprocess
 import sys
 import configparser
 from daemon import Daemon
+from configparser import ConfigParser
 
 import uuid
 
@@ -41,6 +42,11 @@ def get_i2c_sensors():
 
 
 class Monitor(Daemon):
+    verbose = 1
+
+    def logger(self, *args):
+        if self.verbose > 0:
+            print(*args)
 
     def generate_device_id(self):
         self.device_id = uuid.uuid4()
@@ -49,6 +55,12 @@ class Monitor(Daemon):
         self.generate_device_id()
 
     def run(self):
+
+        config = ConfigParser()
+        config.read('homesense.conf')
+        print(config.get('Server', 'device_id'))
+
+
         print("HELLO")
         while True:
             with open('homesense.log', 'a') as out_file:
