@@ -49,8 +49,11 @@ class Monitor(Daemon):
         self.generate_device_id()
 
     def run(self):
+        print("HELLO")
         while True:
-            print("hello")
+            with open('homesense.log', 'a') as out_file:
+                out_file.write("hi" + "\n")
+            time.sleep(5)
 
 # while True:
 #     pass
@@ -91,7 +94,7 @@ class Monitor(Daemon):
 
 
 if __name__ == "__main__":
-        daemon = Monitor('homesense.pid')
+        daemon = Monitor('homesense.pid', verbose=2)
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
                         daemon.start()
