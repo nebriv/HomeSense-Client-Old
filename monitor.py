@@ -48,8 +48,6 @@ class Monitor(Daemon):
     def initialize(self):
         self.generate_device_id()
 
-
-
     def run(self):
         while True:
             print("hello")
