@@ -44,9 +44,10 @@ def get_i2c_sensors():
 class Monitor(Daemon):
     verbose = 1
 
-    def logger(self, *args):
-        if self.verbose > 0:
-            print(*args)
+    def log(self, *args):
+        if self.verbose >= 1:
+            with open('homesense.log', 'a') as out_file:
+                out_file.write(*args + "\n")
 
     def generate_device_id(self):
         self.device_id = uuid.uuid4()
@@ -63,8 +64,7 @@ class Monitor(Daemon):
 
         print("HELLO")
         while True:
-            with open('homesense.log', 'a') as out_file:
-                out_file.write("hi" + "\n")
+
             time.sleep(5)
 
 # while True:
