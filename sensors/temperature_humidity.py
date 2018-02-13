@@ -87,11 +87,7 @@ class Humidity(HTU21DF):
         self.setup()
         self.name = "humidity"
 
-    def get_temperature(self):
-        self.temperature = Temperature().get_data()
-
     def get_data(self):
-        self.get_temperature()
         handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
         self.pi.i2c_write_byte(handle, self.rdhumi) # send read humi command
         time.sleep(0.055) # readings take up to 50ms, lets give it some time
@@ -103,6 +99,6 @@ class Humidity(HTU21DF):
         humi_reading = math.fabs(humi_reading) # I'm an idiot and can't figure out any other way to make it a float
         uncomp_humidity = ((humi_reading / 65536) * 125 ) - 6 # formula from datasheet
         # to get the compensated humidity we need to read the temperature
-        temperature = self.temperature
+        temperature = Temperature().get_data()
         humidity = ((25 - temperature) * -0.15) + uncomp_humidity
         return humidity
