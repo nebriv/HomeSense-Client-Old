@@ -77,6 +77,7 @@ class Temperature(HTU21DF):
         temp_reading = (t1 * 256) + t2 # combine both bytes into one big integer
         temp_reading = math.fabs(temp_reading) # I'm an idiot and can't figure out any other way to make it a float
         temperature = ((temp_reading / 65536) * 175.72 ) - 46.85 # formula from datasheet
+        temperature = 9.0 / 5.0 * temperature + 32
         return temperature
         #return 75.3
 
