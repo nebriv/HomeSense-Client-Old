@@ -1,4 +1,4 @@
-class Sensor():
+class Sensor(object):
     def __init__(self):
         self.name = "Not Implemented"
 
