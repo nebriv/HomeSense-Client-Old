@@ -29,15 +29,13 @@ import pigpio
 import math
 from .base_sensor import Sensor
 
-
-
-
-
-
-
 class HTU21DF(Sensor):
         def __init__(self):
                 super(Sensor, self).__init__()
+                self.setup()
+
+        def setup(self):
+                print("RUNNING SETUP")
                 self.pi = pigpio.pi()
 
                 # HTU21D-F Address
