@@ -83,7 +83,7 @@ def restart_program():
     os.execl(python, python, *sys.argv)
 
 class Monitor(Daemon):
-    verbose = 1
+    verbose = 0
 
     def check_for_updates(self):
         print("Checking for sensor_updates")
