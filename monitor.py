@@ -88,7 +88,9 @@ class Monitor(Daemon):
     def check_for_updates(self):
         print("Checking for sensor_updates")
         g = git.cmd.Git(os.getcwd())
-        print(g.pull())
+        update_results = g.pull()
+        if "Updating " in update_results:
+            restart_program()
 
     def get_sensors(self):
         self.available_sensors = []
