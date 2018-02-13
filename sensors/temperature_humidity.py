@@ -84,7 +84,7 @@ class Temperature(HTU21DF):
 class Humidity(HTU21DF):
 
         def __init__(self):
-                super(Sensor).__init__()
+                super(Sensor, self).__init__()
                 self.name = "humidity"
 
         def get_temperature(self):
