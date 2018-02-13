@@ -30,78 +30,79 @@ import math
 from .base_sensor import Sensor
 
 class HTU21DF(Sensor):
-        def __init__(self):
-                super(Sensor, self).__init__()
-                self.setup()
+    def __init__(self):
+        super(Sensor, self).__init__()
+        self.setup()
 
-        def setup(self):
-                print("RUNNING SETUP")
-                self.pi = pigpio.pi()
+    def setup(self):
+        #print("RUNNING SETUP")
+        self.pi = pigpio.pi()
 
-                # HTU21D-F Address
-                self.addr = 0x40
+        # HTU21D-F Address
+        self.addr = 0x40
 
-                # i2c bus, if you have a Raspberry Pi Rev A, change this to 0
-                self.bus = 1
+        # i2c bus, if you have a Raspberry Pi Rev A, change this to 0
+        self.bus = 1
 
-                # HTU21D-F Commands
-                self.rdtemp = 0xE3
-                self.rdhumi = 0xE5
-                self.wtreg = 0xE6
-                self.rdreg = 0xE7
-                self.reset = 0xFE
+        # HTU21D-F Commands
+        self.rdtemp = 0xE3
+        self.rdhumi = 0xE5
+        self.wtreg = 0xE6
+        self.rdreg = 0xE7
+        self.reset = 0xFE
 
-        def htu_reset(self):
-                handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
-                self.pi.i2c_write_byte(handle, self.reset) # send reset command
-                self.pi.i2c_close(handle) # close i2c bus
-                time.sleep(0.2) # reset takes 15ms so let's give it some time
+    def htu_reset(self):
+        handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
+        self.pi.i2c_write_byte(handle, self.reset) # send reset command
+        self.pi.i2c_close(handle) # close i2c bus
+        time.sleep(0.2) # reset takes 15ms so let's give it some time
 
 
 class Temperature(HTU21DF):
 
-        def __init__(self):
-                super(Sensor, self).__init__()
-                self.setup()
-                self.name = "temperature"
+    def __init__(self):
+        super(Sensor, self).__init__()
+        self.setup()
+        self.name = "temperature"
 
-        def get_data(self):
+    def get_data(self):
 
-                handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
-                self.pi.i2c_write_byte(handle, self.rdtemp) # send read temp command
-                time.sleep(0.055) # readings take up to 50ms, lets give it some time
-                (count, byteArray) = self.pi.i2c_read_device(handle, 3) # vacuum up those bytes
-                self.pi.i2c_close(handle) # close the i2c bus
-                t1 = byteArray[0] # most significant byte msb
-                t2 = byteArray[1] # least significant byte lsb
-                temp_reading = (t1 * 256) + t2 # combine both bytes into one big integer
-                temp_reading = math.fabs(temp_reading) # I'm an idiot and can't figure out any other way to make it a float
-                temperature = ((temp_reading / 65536) * 175.72 ) - 46.85 # formula from datasheet
-                return temperature
-                #return 75.3
+        handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
+        self.pi.i2c_write_byte(handle, self.rdtemp) # send read temp command
+        time.sleep(0.055) # readings take up to 50ms, lets give it some time
+        (count, byteArray) = self.pi.i2c_read_device(handle, 3) # vacuum up those bytes
+        self.pi.i2c_close(handle) # close the i2c bus
+        t1 = byteArray[0] # most significant byte msb
+        t2 = byteArray[1] # least significant byte lsb
+        temp_reading = (t1 * 256) + t2 # combine both bytes into one big integer
+        temp_reading = math.fabs(temp_reading) # I'm an idiot and can't figure out any other way to make it a float
+        temperature = ((temp_reading / 65536) * 175.72 ) - 46.85 # formula from datasheet
+        return temperature
+        #return 75.3
 
 class Humidity(HTU21DF):
 
-        def __init__(self):
-                super(Sensor, self).__init__()
-                self.setup()
-                self.name = "humidity"
+    def __init__(self):
+        super(Sensor, self).__init__()
+        self.setup()
+        self.name = "humidity"
 
-        def get_temperature(self):
-                self.temperature = Temperature().get_data()
+    def get_temperature(self):
+        self.temperature = Temperature().get_data()
 
-        def get_data(self):
-                handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
-                self.pi.i2c_write_byte(handle, self.rdhumi) # send read humi command
-                time.sleep(0.055) # readings take up to 50ms, lets give it some time
-                (count, byteArray) = self.pi.i2c_read_device(handle, 3) # vacuum up those bytes
-                self.pi.i2c_close(handle) # close the i2c bus
-                h1 = byteArray[0] # most significant byte msb
-                h2 = byteArray[1] # least significant byte lsb
-                humi_reading = (h1 * 256) + h2 # combine both bytes into one big integer
-                humi_reading = math.fabs(humi_reading) # I'm an idiot and can't figure out any other way to make it a float
-                uncomp_humidity = ((humi_reading / 65536) * 125 ) - 6 # formula from datasheet
-                # to get the compensated humidity we need to read the temperature
-                temperature = self.temperature
-                humidity = ((25 - temperature) * -0.15) + uncomp_humidity
-                return humidity
+    def get_data(self):
+        self.get_temperature()
+        handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
+        self.pi.i2c_write_byte(handle, self.rdhumi) # send read humi command
+        time.sleep(0.055) # readings take up to 50ms, lets give it some time
+        (count, byteArray) = self.pi.i2c_read_device(handle, 3) # vacuum up those bytes
+        self.pi.i2c_close(handle) # close the i2c bus
+        h1 = byteArray[0] # most significant byte msb
+        h2 = byteArray[1] # least significant byte lsb
+        humi_reading = (h1 * 256) + h2 # combine both bytes into one big integer
+        humi_reading = math.fabs(humi_reading) # I'm an idiot and can't figure out any other way to make it a float
+        uncomp_humidity = ((humi_reading / 65536) * 125 ) - 6 # formula from datasheet
+        # to get the compensated humidity we need to read the temperature
+        temperature = self.temperature
+        humidity = ((25 - temperature) * -0.15) + uncomp_humidity
+        return humidity
