@@ -16,7 +16,8 @@ from daemon import Daemon
 from configparser import ConfigParser
 import os
 from sensors import lux, pressure_altitude, temperature_humidity
-
+import logging
+import psutil
 import uuid
 
 api_server = "http://192.168.1.161:8000"
@@ -65,6 +66,20 @@ def int_to_en(num):
 
     raise AssertionError('num is too large: %s' % str(num))
 
+def restart_program():
+    """Restarts the current program, with file objects and descriptors
+       cleanup
+    """
+
+    try:
+        p = psutil.Process(os.getpid())
+        for handler in p.get_open_files() + p.connections():
+            os.close(handler.fd)
+    except Exception as e:
+        logging.error(e)
+
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
 class Monitor(Daemon):
     verbose = 1
@@ -72,7 +87,7 @@ class Monitor(Daemon):
     def check_for_updates(self):
         print("Checking for sensor_updates")
         g = git.cmd.Git(os.getcwd())
-        g.pull()
+        print(g.pull())
 
     def get_sensors(self):
         self.available_sensors = []
