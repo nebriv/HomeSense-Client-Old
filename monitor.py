@@ -191,7 +191,7 @@ class Monitor(Daemon):
     def collect_sensor_data(self):
         sensor_data = {}
         for sensor in self.sensors:
-            sensor_data[sensor.get_name()] = sensor.get_data()
+            sensor_data[sensor.get_name()] = round(sensor.get_data(), 3)
 
         for each in self.available_sensors:
             each['latest_data'] = sensor_data[each['name']]
