@@ -71,6 +71,7 @@ def restart_program():
        cleanup
     """
 
+    print("Restarting to apply updates")
     try:
         p = psutil.Process(os.getpid())
         for handler in p.get_open_files() + p.connections():
