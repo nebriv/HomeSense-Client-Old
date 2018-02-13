@@ -10,10 +10,11 @@ import datetime
 import requests
 import subprocess
 import sys
+import git
 import configparser
 from daemon import Daemon
 from configparser import ConfigParser
-
+import os
 from sensors import lux, pressure_altitude, temperature_humidity
 
 import uuid
@@ -67,6 +68,11 @@ def int_to_en(num):
 
 class Monitor(Daemon):
     verbose = 1
+
+    def check_for_updates(self):
+        print("Checking for sensor_updates")
+        g = git.cmd.Git(cwd = os.getcwd())
+        g.pull()
 
     def get_sensors(self):
         self.available_sensors = []
@@ -184,6 +190,7 @@ class Monitor(Daemon):
         self.save_config()
 
     def run(self):
+        self.check_for_updates()
         self.config = ConfigParser()
         try:
             with open('homesense.conf') as f:
