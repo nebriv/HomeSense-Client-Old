@@ -11,6 +11,7 @@ from .base_sensor import Sensor
 class Pressure(Sensor):
 
     def __init__(self):
+        super(Sensor, self).__init__()
         self.name = "pressure"
         self.bus = smbus.SMBus(1)
 

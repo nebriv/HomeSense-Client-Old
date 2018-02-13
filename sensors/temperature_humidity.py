@@ -37,7 +37,7 @@ from .base_sensor import Sensor
 
 class HTU21DF(Sensor):
         def __init__(self):
-                super(Sensor).__init__()
+                super(Sensor, self).__init__()
                 self.pi = pigpio.pi()
 
                 # HTU21D-F Address
@@ -63,7 +63,7 @@ class HTU21DF(Sensor):
 class Temperature(HTU21DF):
 
         def __init__(self):
-                super(Sensor).__init__()
+                super(Sensor, self).__init__()
                 self.name = "temperature"
 
         def get_data(self):
