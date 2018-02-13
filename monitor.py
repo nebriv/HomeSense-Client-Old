@@ -14,7 +14,7 @@ import configparser
 from daemon import Daemon
 from configparser import ConfigParser
 
-from sensors import lux
+from sensors import lux, pressure_altitude, temperature_humidity
 
 import uuid
 
@@ -95,7 +95,7 @@ class Monitor(Daemon):
         i = 1
         for sensor_address in self.config.items('SensorAddresses'):
             if sensor_address[1] in self.sensor_addresses:
-                print(sensor_address)
+                #print(sensor_address)
                 try:
                     unit = self.config.get('SensorUnits', sensor_address[0])
                     #print(unit)
@@ -104,7 +104,7 @@ class Monitor(Daemon):
                         print("No unit set")
                         unit = "Unknown"
 
-                self.available_sensors.append({'sensor_name': "sensor_%s_name" % int_to_en(i),
+                self.available_sensors.append({'sensor_name': "sensor_%s" % int_to_en(i),
                                                'name': sensor_address[0],
                                                'sensor_data_unit_name': "sensor_%s_data_unit" % int_to_en(i),
                                                'sensor_data_unit': unit,
@@ -146,7 +146,7 @@ class Monitor(Daemon):
             exit()
 
         for each in self.available_sensors:
-            data[each['sensor_name']] = each['name']
+            data[each['sensor_name']] = each['name'] + "_name"
             data[each['sensor_data_unit_name']] = each['sensor_data_unit']
             data['token'] = self.token
         r = requests.post(api_server + "/api/sensors/register/", data=data)
@@ -157,14 +157,22 @@ class Monitor(Daemon):
             exit()
 
     def initialize_sensors(self):
-        self.sensors = {}
-        self.sensors['light'] = lux.Lux()
+        self.sensors =  []
+        self.sensors.append(lux.Lux())
+        self.sensors.append(pressure_altitude.Pressure())
+        self.sensors.append(temperature_humidity.Temperature())
+        self.sensors.append(temperature_humidity.Humidity())
+
 
     def collect_sensor_data(self):
         sensor_data = {}
         for sensor in self.sensors:
             sensor_data[sensor.get_name()] = sensor.get_data()
-        print(sensor_data)
+
+        for each in self.available_sensors:
+            each['latest_data'] = sensor_data[each['name']]
+
+        #     sensor_data[sensor.get_name()] = sensor.get_data()
 
 
     def initialize(self):
@@ -193,18 +201,23 @@ class Monitor(Daemon):
 
         while True:
             self.collect_sensor_data()
-            time.sleep(30)
-            # try:
-            #     post_data = {'device_id': self.device_id, 'token': self.token, "sensor_one_data": 50}
-            #     r = requests.post(api_server + '/api/data/add/', data=post_data)
-            #     if r.status_code == 201:
-            #         print("Data Uploaded")
-            #     else:
-            #         print(r.status_code)
-            #         print(r.json())
-            # except Exception as err:
-            #     print(err)
-            # time.sleep(10)
+            try:
+                post_data = {'device_id': self.device_id, 'token': self.token}
+                for each_sensor in self.available_sensors:
+                    post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
+                print(post_data)
+
+                r = requests.post(api_server + '/api/data/add/', data=post_data)
+                if r.status_code == 201:
+                    print("Data Uploaded")
+                else:
+                    print(r.status_code)
+                    print(r.json())
+            except Exception as err:
+                print(err)
+
+            time.sleep(10)
+
 
 # while True:
 #     pass

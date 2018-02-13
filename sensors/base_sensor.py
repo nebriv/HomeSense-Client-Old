@@ -1,5 +1,4 @@
-class Sensor:
-
+class Sensor():
     def __init__(self):
         self.name = "Not Implemented"
 
@@ -8,3 +7,10 @@ class Sensor:
 
     def get_data(self):
         return NotImplementedError
+
+def main():
+    sensor = Sensor()
+
+
+if __name__ == "__main__":
+    main()
