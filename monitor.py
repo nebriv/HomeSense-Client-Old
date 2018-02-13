@@ -196,9 +196,6 @@ class Monitor(Daemon):
         for each in self.available_sensors:
             each['latest_data'] = sensor_data[each['name']]
 
-        #     sensor_data[sensor.get_name()] = sensor.get_data()
-
-
     def initialize(self):
         print("Initializing HomeSense Monitor...")
         self.generate_device_id()
@@ -241,7 +238,7 @@ class Monitor(Daemon):
             except Exception as err:
                 print(err)
 
-            time.sleep(10)
+            time.sleep(300)
 
 
 # while True:
