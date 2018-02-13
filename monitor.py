@@ -71,7 +71,7 @@ class Monitor(Daemon):
 
     def check_for_updates(self):
         print("Checking for sensor_updates")
-        g = git.cmd.Git(cwd = os.getcwd())
+        g = git.cmd.Git(os.getcwd())
         g.pull()
 
     def get_sensors(self):
