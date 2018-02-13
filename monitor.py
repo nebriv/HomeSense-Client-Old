@@ -14,58 +14,196 @@ import configparser
 from daemon import Daemon
 from configparser import ConfigParser
 
+from sensors import lux
+
 import uuid
 
 api_server = "http://192.168.1.161:8000"
 sensor_id = "http://127.0.0.1:8000/api/sensors/1dbe5bb9-6ee6-46a1-86c7-cfdf274033a4/"
 
-def get_i2c_sensors():
-    p = subprocess.Popen(['i2cdetect', '-y', '1'], stdout=subprocess.PIPE, )
-    firstLine = True
-    sensor_addresses = []
+def int_to_en(num):
+    d = { 0 : 'zero', 1 : 'one', 2 : 'two', 3 : 'three', 4 : 'four', 5 : 'five',
+          6 : 'six', 7 : 'seven', 8 : 'eight', 9 : 'nine', 10 : 'ten',
+          11 : 'eleven', 12 : 'twelve', 13 : 'thirteen', 14 : 'fourteen',
+          15 : 'fifteen', 16 : 'sixteen', 17 : 'seventeen', 18 : 'eighteen',
+          19 : 'nineteen', 20 : 'twenty',
+          30 : 'thirty', 40 : 'forty', 50 : 'fifty', 60 : 'sixty',
+          70 : 'seventy', 80 : 'eighty', 90 : 'ninety' }
+    k = 1000
+    m = k * 1000
+    b = m * 1000
+    t = b * 1000
 
-    for i in range(1, 9):
-        if firstLine:
-            line = str(p.stdout.readline()).strip()
-            firstLine = False
-        else:
-            line = str(p.stdout.readline()).strip()
-            #print line
-            entry = line.split(" ")
-            entry = entry[1:]
-            for each in entry:
-                if (each != "") and (each != "--"):
-                    #print(each)
-                    sensor_addresses.append("0x%s" % each)
-    for sensor in sensor_addresses:
-        print("Found Sensor: %s" % sensor)
+    assert(0 <= num)
+
+    if (num < 20):
+        return d[num]
+
+    if (num < 100):
+        if num % 10 == 0: return d[num]
+        else: return d[num // 10 * 10] + '-' + d[num % 10]
+
+    if (num < k):
+        if num % 100 == 0: return d[num // 100] + ' hundred'
+        else: return d[num // 100] + ' hundred and ' + int_to_en(num % 100)
+
+    if (num < m):
+        if num % k == 0: return int_to_en(num // k) + ' thousand'
+        else: return int_to_en(num // k) + ' thousand, ' + int_to_en(num % k)
+
+    if (num < b):
+        if (num % m) == 0: return int_to_en(num // m) + ' million'
+        else: return int_to_en(num // m) + ' million, ' + int_to_en(num % m)
+
+    if (num < t):
+        if (num % b) == 0: return int_to_en(num // b) + ' billion'
+        else: return int_to_en(num // b) + ' billion, ' + int_to_en(num % b)
+
+    if (num % t == 0): return int_to_en(num // t) + ' trillion'
+    else: return int_to_en(num // t) + ' trillion, ' + int_to_en(num % t)
+
+    raise AssertionError('num is too large: %s' % str(num))
 
 
 class Monitor(Daemon):
     verbose = 1
 
+    def get_sensors(self):
+        self.available_sensors = []
+        try:
+            p = subprocess.Popen(['i2cdetect', '-y', '1'], stdout=subprocess.PIPE, )
+            firstLine = True
+            self.sensor_addresses = []
+
+            for i in range(1, 9):
+                if firstLine:
+                    line = str(p.stdout.readline()).strip()
+                    firstLine = False
+                else:
+                    line = str(p.stdout.readline()).strip()
+                    # print line
+                    entry = line.split(" ")
+                    entry = entry[1:]
+                    for each in entry:
+                        if (each != "") and (each != "--"):
+                            # print(each)
+                            self.sensor_addresses.append("0x%s" % each)
+        except FileNotFoundError as err:
+            print("Not supported on this OS, setting dummy vars")
+            self.sensor_addresses = ['0x40', '0x60', '0x39']
+
+        i = 1
+        for sensor_address in self.config.items('SensorAddresses'):
+            if sensor_address[1] in self.sensor_addresses:
+                print(sensor_address)
+                try:
+                    unit = self.config.get('SensorUnits', sensor_address[0])
+                    #print(unit)
+                except Exception as e:
+                    if "No option" in str(e):
+                        print("No unit set")
+                        unit = "Unknown"
+
+                self.available_sensors.append({'sensor_name': "sensor_%s_name" % int_to_en(i),
+                                               'name': sensor_address[0],
+                                               'sensor_data_unit_name': "sensor_%s_data_unit" % int_to_en(i),
+                                               'sensor_data_unit': unit,
+                                               'address': sensor_address[1]})
+                i += 1
+        #print(self.available_sensors)
+        #exit()
+
+
     def log(self, *args):
         if self.verbose >= 1:
             with open('homesense.log', 'a') as out_file:
-                out_file.write(*args + "\n")
+                out_file.write(str(*args) + "\n")
 
     def generate_device_id(self):
-        self.device_id = uuid.uuid4()
+        self.device_id = str(uuid.uuid4())
+
+    def save_config(self):
+        self.print_config()
+        with open('homesense.conf', 'w') as configfile:
+            self.config.write(configfile)
+
+    def print_config(self):
+        for section in self.config.sections():
+            for option in self.config.items(section):
+                print(section, option)
+
+    def register(self):
+        data = {'device_id': self.device_id}
+        i = 1
+        r = requests.get(api_server + "/api/sensors/get_token/")
+
+        if r.status_code == 200:
+            self.token = r.json()['token']
+            self.config.set("Server", "token", self.token)
+
+        else:
+            print(r.status_code, r.text)
+            exit()
+
+        for each in self.available_sensors:
+            data[each['sensor_name']] = each['name']
+            data[each['sensor_data_unit_name']] = each['sensor_data_unit']
+            data['token'] = self.token
+        r = requests.post(api_server + "/api/sensors/register/", data=data)
+        if r.status_code == 201:
+            print("Successfully Registered Sensor")
+        else:
+            print(r.status_code, r.text)
+            exit()
+
+    def initialize_sensors(self):
+        self.sensors['light'] = lux()
+
+    def collect_sensor_data(self):
+        sensor_data = {}
+        for sensor in self.sensors:
+            sensor_data[sensor.get_name()] = sensor.get_data()
+        print(sensor_data)
+
 
     def initialize(self):
+        print("Initializing HomeSense Monitor...")
         self.generate_device_id()
+        print("Device ID: %s" % self.device_id)
+        self.config.set('Server', 'device_id', str(self.device_id))
+        self.register()
+        self.save_config()
 
     def run(self):
+        self.config = ConfigParser()
+        try:
+            with open('homesense.conf') as f:
+                self.config.read_file(f)
+                self.token = self.config.get('Server', 'Token')
+                self.device_id = self.config.get('Server', 'Device_id')
+                self.get_sensors()
+        except IOError as err:
+            print("Config File Not Found.")
+            self.config.read('.homesense_init.conf')
+            self.get_sensors()
+            self.initialize()
 
-        config = ConfigParser()
-        config.read('homesense.conf')
-        print(config.get('Server', 'device_id'))
+        self.initialize_sensors()
 
-
-        print("HELLO")
         while True:
-
-            time.sleep(5)
+            self.collect_sensor_data()
+            time.sleep(30)
+            # try:
+            #     post_data = {'device_id': self.device_id, 'token': self.token, "sensor_one_data": 50}
+            #     r = requests.post(api_server + '/api/data/add/', data=post_data)
+            #     if r.status_code == 201:
+            #         print("Data Uploaded")
+            #     else:
+            #         print(r.status_code)
+            #         print(r.json())
+            # except Exception as err:
+            #     print(err)
+            # time.sleep(10)
 
 # while True:
 #     pass
@@ -106,18 +244,20 @@ class Monitor(Daemon):
 
 
 if __name__ == "__main__":
-        daemon = Monitor('homesense.pid', verbose=2)
-        if len(sys.argv) == 2:
-                if 'start' == sys.argv[1]:
-                        daemon.start()
-                elif 'stop' == sys.argv[1]:
-                        daemon.stop()
-                elif 'restart' == sys.argv[1]:
-                        daemon.restart()
-                else:
-                        print("Unknown command")
-                        sys.exit(2)
-                sys.exit(0)
+    daemon = Monitor('homesense.pid', verbose=2)
+    if len(sys.argv) == 2:
+        if 'start' == sys.argv[1]:
+            daemon.start()
+        elif 'stop' == sys.argv[1]:
+            daemon.stop()
+        elif 'restart' == sys.argv[1]:
+            daemon.restart()
+        elif 'debug' == sys.argv[1]:
+            daemon.run()
         else:
-                print("usage: %s start|stop|restart" % sys.argv[0])
-                sys.exit(2)
+            print("Unknown command")
+            sys.exit(2)
+        sys.exit(0)
+    else:
+        print("usage: %s start|stop|restart" % sys.argv[0])
+        sys.exit(2)
