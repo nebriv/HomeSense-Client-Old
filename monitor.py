@@ -157,6 +157,7 @@ class Monitor(Daemon):
             exit()
 
     def initialize_sensors(self):
+        self.sensors = {}
         self.sensors['light'] = lux.Lux()
 
     def collect_sensor_data(self):
