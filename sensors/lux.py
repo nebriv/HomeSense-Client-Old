@@ -1,6 +1,6 @@
-#from tsl2561 import TSL2561
-#from time import sleep
-#import pigpio
+from tsl2561 import TSL2561
+from time import sleep
+import pigpio
 from .base_sensor import Sensor
 
 class Lux(Sensor):
