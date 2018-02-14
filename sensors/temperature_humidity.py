@@ -65,7 +65,7 @@ class Temperature(HTU21DF):
         self.setup()
         self.name = "temperature"
 
-    def get_data(self, celsius=None):
+    def get_data(self, celsius=False):
         try:
             handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
             self.pi.i2c_write_byte(handle, self.rdtemp) # send read temp command
@@ -78,6 +78,8 @@ class Temperature(HTU21DF):
             temp_reading = math.fabs(temp_reading) # I'm an idiot and can't figure out any other way to make it a float
             temperature = ((temp_reading / 65536) * 175.72 ) - 46.85 # formula from datasheet
             if celsius:
+                return temperature
+            else:
                 temperature = 9.0 / 5.0 * temperature + 32
             return temperature
         except Exception as err:
@@ -105,7 +107,7 @@ class Humidity(HTU21DF):
             humi_reading = math.fabs(humi_reading) # I'm an idiot and can't figure out any other way to make it a float
             uncomp_humidity = ((humi_reading / 65536) * 125 ) - 6 # formula from datasheet
             # to get the compensated humidity we need to read the temperature
-            temperature = Temperature().get_data()
+            temperature = Temperature().get_data(celsius=True)
             humidity = ((25 - temperature) * -0.15) + uncomp_humidity
             return humidity
         except Exception as err:
