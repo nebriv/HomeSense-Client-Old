@@ -84,7 +84,7 @@ class Temperature(HTU21DF):
             return temperature
         except Exception as err:
             print(err)
-            return 0
+            return None
         #return 75.3
 
 class Humidity(HTU21DF):
@@ -112,4 +112,4 @@ class Humidity(HTU21DF):
             return humidity
         except Exception as err:
             print(err)
-            return 0
+            return None
