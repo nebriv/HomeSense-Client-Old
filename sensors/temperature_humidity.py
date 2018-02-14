@@ -65,7 +65,7 @@ class Temperature(HTU21DF):
         self.setup()
         self.name = "temperature"
 
-    def get_data(self):
+    def get_data(self, celsius=None):
         try:
             handle = self.pi.i2c_open(self.bus, self.addr) # open i2c bus
             self.pi.i2c_write_byte(handle, self.rdtemp) # send read temp command
@@ -77,7 +77,8 @@ class Temperature(HTU21DF):
             temp_reading = (t1 * 256) + t2 # combine both bytes into one big integer
             temp_reading = math.fabs(temp_reading) # I'm an idiot and can't figure out any other way to make it a float
             temperature = ((temp_reading / 65536) * 175.72 ) - 46.85 # formula from datasheet
-            temperature = 9.0 / 5.0 * temperature + 32
+            if celsius:
+                temperature = 9.0 / 5.0 * temperature + 32
             return temperature
         except Exception as err:
             print(err)
