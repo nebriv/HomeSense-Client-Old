@@ -239,7 +239,7 @@ class Monitor(Daemon):
             except Exception as err:
                 print(err)
 
-            time.sleep(300)
+            time.sleep(30)
 
 
 # while True:
