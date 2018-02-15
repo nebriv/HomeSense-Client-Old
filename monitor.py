@@ -189,18 +189,21 @@ class Monitor(Daemon):
 
 
     def collect_sensor_data(self):
-        sensor_data = {}
-        for sensor in self.sensors:
-            data = sensor.get_data()
-            if data == None:
-                pass
-            else:
-                sensor_data[sensor.get_name()] = round(sensor.get_data(), 3)
-            time.sleep(.5)
+        try:
+            sensor_data = {}
+            for sensor in self.sensors:
+                data = sensor.get_data()
+                if data == None:
+                    sensor_data[sensor.get_name()] = None
+                else:
+                    sensor_data[sensor.get_name()] = round(sensor.get_data(), 3)
+                time.sleep(.5)
 
-        for each in self.available_sensors:
-            each['latest_data'] = sensor_data[each['name']]
-
+            for each in self.available_sensors:
+                each['latest_data'] = sensor_data[each['name']]
+        except Exception as err:
+            print(err
+                  )
     def initialize(self):
         print("Initializing HomeSense Monitor...")
         self.generate_device_id()
