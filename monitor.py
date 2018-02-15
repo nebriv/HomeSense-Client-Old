@@ -191,7 +191,11 @@ class Monitor(Daemon):
     def collect_sensor_data(self):
         sensor_data = {}
         for sensor in self.sensors:
-            sensor_data[sensor.get_name()] = round(sensor.get_data(), 3)
+            data = sensor.get_data()
+            if data == None:
+                pass
+            else:
+                sensor_data[sensor.get_name()] = round(sensor.get_data(), 3)
             time.sleep(.5)
 
         for each in self.available_sensors:
