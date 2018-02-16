@@ -71,7 +71,7 @@ class tvoc(SGP30):
 class co2(SGP30):
     def __init__(self):
         super(SGP30).__init__()
-        #self.setup()
+        self.setup()
         self.name = "Co2"
 
     def get_data(self):
