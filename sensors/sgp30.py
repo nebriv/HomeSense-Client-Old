@@ -63,7 +63,7 @@ class SGP30():
 
 class tvoc(SGP30):
     def __init__(self):
-        super(SGP30, self).__init__()
+        super(SGP30).__init__()
         #self.setup()
         self.name = "TVOC"
 
@@ -72,7 +72,7 @@ class tvoc(SGP30):
 
 class co2(SGP30):
     def __init__(self):
-        super(SGP30, self).__init__()
+        super(SGP30).__init__()
         self.setup()
         self.name = "Co2"
 
