@@ -193,23 +193,20 @@ class Monitor(Daemon):
 
 
     def collect_sensor_data(self):
-        try:
-            sensor_data = {}
-            for sensor in self.sensors:
-                print("getting data from %s" % sensor.get_name())
-                data = sensor.get_data()
-                print(data)
-                if data == None:
-                    sensor_data[sensor.get_name()] = None
-                else:
-                    sensor_data[sensor.get_name()] = round(data, 3)
-                time.sleep(.5)
+        sensor_data = {}
+        for sensor in self.sensors:
+            print("getting data from %s" % sensor.get_name())
+            data = sensor.get_data()
+            print(data)
+            if data == None:
+                sensor_data[sensor.get_name()] = None
+            else:
+                sensor_data[sensor.get_name()] = round(data, 3)
+            time.sleep(.5)
 
-            for each in self.available_sensors:
-                each['latest_data'] = sensor_data[each['name']]
-        except Exception as err:
-            print(err)
-            exit()
+        for each in self.available_sensors:
+            each['latest_data'] = sensor_data[each['name']]
+
 
     def initialize(self):
         print("Initializing HomeSense Monitor...")
@@ -238,20 +235,19 @@ class Monitor(Daemon):
 
         while True:
             self.collect_sensor_data()
-            try:
-                post_data = {'device_id': self.device_id, 'token': self.token}
-                for each_sensor in self.available_sensors:
-                    post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
-                #print(post_data)
-                print(post_data)
-                r = requests.post(api_server + '/api/data/add/', data=post_data)
-                if r.status_code == 201:
-                    print("Data Uploaded")
-                else:
-                    print(r.status_code)
-                    print(r.json())
-            except Exception as err:
-                print(err)
+
+            post_data = {'device_id': self.device_id, 'token': self.token}
+            for each_sensor in self.available_sensors:
+                post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
+            #print(post_data)
+            print(post_data)
+            r = requests.post(api_server + '/api/data/add/', data=post_data)
+            if r.status_code == 201:
+                print("Data Uploaded")
+            else:
+                print(r.status_code)
+                print(r.json())
+
 
             time.sleep(300)
 
