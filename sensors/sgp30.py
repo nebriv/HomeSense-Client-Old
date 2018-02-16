@@ -86,6 +86,7 @@ class co2(SGP30):
             self.threadl
         except AttributeError:
             print("co2 Thread Not Started")
+            self.setup()
         else:
             print("co2 Thread Started")
         #super(co2,self).__init__()
