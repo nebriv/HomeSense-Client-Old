@@ -77,6 +77,7 @@ class Temperature(HTU21DF):
             temp_reading = (t1 * 256) + t2 # combine both bytes into one big integer
             temp_reading = math.fabs(temp_reading) # I'm an idiot and can't figure out any other way to make it a float
             temperature = ((temp_reading / 65536) * 175.72 ) - 46.85 # formula from datasheet
+            self.pi.i2c_close(handle)
             if celsius:
                 return temperature
             else:
@@ -107,7 +108,8 @@ class Humidity(HTU21DF):
             humi_reading = math.fabs(humi_reading) # I'm an idiot and can't figure out any other way to make it a float
             uncomp_humidity = ((humi_reading / 65536) * 125 ) - 6 # formula from datasheet
             # to get the compensated humidity we need to read the temperature
-            time.sleep(.3)
+            self.pi.i2c_close(handle)
+            time.sleep(1)
             temperature = Temperature().get_data(celsius=True)
             humidity = ((25 - temperature) * -0.15) + uncomp_humidity
             return humidity
