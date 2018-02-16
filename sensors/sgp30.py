@@ -78,7 +78,7 @@ class co2(SGP30):
     def __init__(self):
         #super(SGP30).__init__()
         self.setup()
-        self.name = "Co2"
+        self.name = "co2"
 
     def get_name(self):
         return self.name
