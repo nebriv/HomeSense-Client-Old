@@ -117,7 +117,7 @@ class Monitor(Daemon):
             self.sensor_addresses = ['0x40', '0x60', '0x39']
 
         i = 1
-        self.sensor_addresses.append("0x58")
+
         for sensor_address in self.config.items('SensorAddresses'):
             if sensor_address[1] in self.sensor_addresses:
                 #print(sensor_address)

@@ -64,6 +64,12 @@ class SGP30():
 
 class tvoc(SGP30):
     def __init__(self):
+        try:
+            self.threadl
+        except NameError:
+            print("tvoc Thread Not Started")
+        else:
+            print("tvoc Thread Started")
         #super(SGP30).__init__()
         #self.setup()
         self.name = "TVOC"
@@ -76,8 +82,14 @@ class tvoc(SGP30):
 
 class co2(SGP30):
     def __init__(self):
-        #super(SGP30).__init__()
-        self.setup()
+        try:
+            self.threadl
+        except NameError:
+            print("co2 Thread Not Started")
+        else:
+            print("co2 Thread Started")
+        super(co2,self).__init__()
+        #self.setup()
         self.name = "co2"
 
     def get_name(self):
