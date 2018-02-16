@@ -56,16 +56,19 @@ class SGP30():
         self.sensor_running = True
         time.sleep(15)
         print("Sensor Started")
+        #return thread1
         #while True:
         #    print(self.co2)
         #    time.sleep(5)
 
     #def get_data(self)
 
+
+
 class tvoc(SGP30):
     def __init__(self):
         try:
-            self.threadl
+            self.thread1
         except AttributeError:
             print("voc Thread Not Started")
             self.setup()
@@ -84,7 +87,7 @@ class tvoc(SGP30):
 class co2(SGP30):
     def __init__(self):
         try:
-            self.threadl
+            self.thread1
         except AttributeError:
             print("co2 Thread Not Started")
             self.setup()
