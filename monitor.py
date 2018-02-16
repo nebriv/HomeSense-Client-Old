@@ -214,7 +214,7 @@ class Monitor(Daemon):
         print("Device ID: %s" % self.device_id)
         self.config.set('Server', 'device_id', str(self.device_id))
         self.register()
-        self.save_config()
+        #self.save_config()
 
     def run(self):
         self.check_for_updates()
