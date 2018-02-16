@@ -15,7 +15,7 @@ import configparser
 from daemon import Daemon
 from configparser import ConfigParser
 import os
-from sensors import lux, pressure_altitude, temperature_humidity
+from sensors import lux, pressure_altitude, temperature_humidity, sgp30
 import logging
 import psutil
 import uuid
@@ -186,6 +186,8 @@ class Monitor(Daemon):
         self.sensors.append(pressure_altitude.Pressure())
         self.sensors.append(temperature_humidity.Temperature())
         self.sensors.append(temperature_humidity.Humidity())
+        self.sensors.append(sgp30.co2())
+        self.sensors.append(sgp30.tvoc())
 
 
     def collect_sensor_data(self):
