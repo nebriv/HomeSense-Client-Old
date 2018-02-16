@@ -196,6 +196,7 @@ class Monitor(Daemon):
         try:
             sensor_data = {}
             for sensor in self.sensors:
+                print("getting data from %s" % sensor.get_name())
                 data = sensor.get_data()
                 if data == None:
                     sensor_data[sensor.get_name()] = None
@@ -207,6 +208,7 @@ class Monitor(Daemon):
                 each['latest_data'] = sensor_data[each['name']]
         except Exception as err:
             print(err)
+            exit()
 
     def initialize(self):
         print("Initializing HomeSense Monitor...")
