@@ -88,7 +88,7 @@ class co2(SGP30):
             print("co2 Thread Not Started")
         else:
             print("co2 Thread Started")
-        super(co2,self).__init__()
+        #super(co2,self).__init__()
         #self.setup()
         self.name = "co2"
 
