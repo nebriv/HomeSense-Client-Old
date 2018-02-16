@@ -195,9 +195,8 @@ class Monitor(Daemon):
     def collect_sensor_data(self):
         sensor_data = {}
         for sensor in self.sensors:
-            print("getting data from %s" % sensor.get_name())
             data = sensor.get_data()
-            print(data)
+
             if data == None:
                 sensor_data[sensor.get_name()] = None
             else:

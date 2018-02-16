@@ -84,7 +84,6 @@ class co2(SGP30):
         return self.name
 
     def get_data(self):
-        print(self.co2)
         return self.co2
 
 def main():
