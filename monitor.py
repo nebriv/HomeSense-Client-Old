@@ -214,7 +214,7 @@ class Monitor(Daemon):
         print("Device ID: %s" % self.device_id)
         self.config.set('Server', 'device_id', str(self.device_id))
         self.register()
-        #self.save_config()
+        self.save_config()
 
     def run(self):
         self.check_for_updates()
@@ -239,7 +239,7 @@ class Monitor(Daemon):
                 post_data = {'device_id': self.device_id, 'token': self.token}
                 for each_sensor in self.available_sensors:
                     post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
-                print(post_data)
+                #print(post_data)
 
                 r = requests.post(api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:

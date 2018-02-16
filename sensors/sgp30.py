@@ -20,8 +20,9 @@ class SGP30():
             #print(count, data)
             #self.co2 = int.from_bytes(data[0:2], byteorder='big')
             #self.voc = int.from_bytes(data[3:4], byteorder='big')
-            self.co2 = int(data[0:2].encode('hex'), 16)
-            print(self.co2)
+            self.co2 = int(str(data[0:2]).encode('hex'), 16)
+            self.voc = int(str(data[3:4]).encode('hex'), 16)
+            #print(self.co2)
             #print("Co2: %i" % self.co2)
             #print("TVOC: %i" % self.voc)
             time.sleep(.6)
@@ -67,6 +68,9 @@ class tvoc(SGP30):
         #self.setup()
         self.name = "TVOC"
 
+    def get_name(self):
+        return self.name
+
     def get_data(self):
         return self.voc
 
@@ -75,6 +79,9 @@ class co2(SGP30):
         super(SGP30).__init__()
         self.setup()
         self.name = "Co2"
+
+    def get_name(self):
+        return self.name
 
     def get_data(self):
         return self.co2
