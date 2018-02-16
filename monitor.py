@@ -171,7 +171,7 @@ class Monitor(Daemon):
             exit()
 
         for each in self.available_sensors:
-            data[each['sensor_name']] = each['name'] + "_name"
+            data[each['sensor_name'] + "_name"] = each['name']
             data[each['sensor_data_unit_name']] = each['sensor_data_unit']
             data['token'] = self.token
         print("REGISTRATION: %s" % data)
