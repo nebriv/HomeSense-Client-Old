@@ -17,10 +17,10 @@ class SGP30(Sensor):
             self.pi.i2c_write_device(self.handle, self.measureair)
             time.sleep(.2)
             count, data = self.pi.i2c_read_device(self.handle,6)
-            print(count, data)
+            #print(count, data)
             self.co2 = int.from_bytes(data[0:2], byteorder='big')
             self.voc = int.from_bytes(data[3:4], byteorder='big')
-            #print("Co2: %i" % self.co2)
+            print("Co2: %i" % self.co2)
             #print("TVOC: %i" % self.voc)
             time.sleep(.6)
 
