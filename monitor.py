@@ -134,7 +134,7 @@ class Monitor(Daemon):
                                                'sensor_data_unit': unit,
                                                'address': sensor_address[1]})
                 i += 1
-        #print(self.available_sensors)
+        print(self.available_sensors)
         #exit()
 
 
@@ -170,6 +170,7 @@ class Monitor(Daemon):
             exit()
 
         for each in self.available_sensors:
+            print(each)
             data[each['sensor_name']] = each['name'] + "_name"
             data[each['sensor_data_unit_name']] = each['sensor_data_unit']
             data['token'] = self.token
