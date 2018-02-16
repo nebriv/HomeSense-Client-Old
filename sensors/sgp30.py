@@ -66,10 +66,11 @@ class tvoc(SGP30):
     def __init__(self):
         try:
             self.threadl
-        except NameError:
-            print("tvoc Thread Not Started")
+        except AttributeError:
+            print("voc Thread Not Started")
+            self.setup()
         else:
-            print("tvoc Thread Started")
+            print("voc Thread Started")
         #super(SGP30).__init__()
         #self.setup()
         self.name = "TVOC"
@@ -108,8 +109,8 @@ def main():
         print(sensor.get_data())
         time.sleep(2)
 
-    #sensor2 = co2()
-    #print(sensor2.get_data())
+    sensor2 = tvoc()
+    print(sensor2.get_data())
 
 
 
