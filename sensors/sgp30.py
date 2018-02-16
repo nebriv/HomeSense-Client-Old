@@ -5,11 +5,11 @@ import binascii
 from struct import unpack
 
 from threading import Thread
-#from .base_sensor import Sensor
+from .base_sensor import Sensor
 
-class SGP30():
+class SGP30(Sensor):
     def __init__(self):
-        #super(Sensor, self).__init__()
+        super(Sensor).__init__()
         self.setup()
 
     def run_sensor(self):
