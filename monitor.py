@@ -198,10 +198,11 @@ class Monitor(Daemon):
             for sensor in self.sensors:
                 print("getting data from %s" % sensor.get_name())
                 data = sensor.get_data()
+                print(data)
                 if data == None:
                     sensor_data[sensor.get_name()] = None
                 else:
-                    sensor_data[sensor.get_name()] = round(sensor.get_data(), 3)
+                    sensor_data[sensor.get_name()] = round(data, 3)
                 time.sleep(.5)
 
             for each in self.available_sensors:
@@ -242,7 +243,7 @@ class Monitor(Daemon):
                 for each_sensor in self.available_sensors:
                     post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
                 #print(post_data)
-
+                print(post_data)
                 r = requests.post(api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
                     print("Data Uploaded")
