@@ -5,11 +5,11 @@ import binascii
 from struct import unpack
 
 from threading import Thread
-from .base_sensor import Sensor
+#from .base_sensor import Sensor
 
-class SGP30(Sensor):
+class SGP30():
     def __init__(self):
-        super(Sensor).__init__()
+        #super(Sensor).__init__()
         self.setup()
 
     def run_sensor(self):
@@ -18,8 +18,10 @@ class SGP30(Sensor):
             time.sleep(.2)
             count, data = self.pi.i2c_read_device(self.handle,6)
             #print(count, data)
-            self.co2 = int.from_bytes(data[0:2], byteorder='big')
-            self.voc = int.from_bytes(data[3:4], byteorder='big')
+            #self.co2 = int.from_bytes(data[0:2], byteorder='big')
+            #self.voc = int.from_bytes(data[3:4], byteorder='big')
+            self.co2 = int(data[0:2].encode('hex'), 16)
+            print(self.co2)
             #print("Co2: %i" % self.co2)
             #print("TVOC: %i" % self.voc)
             time.sleep(.6)
@@ -61,7 +63,7 @@ class SGP30(Sensor):
 
 class tvoc(SGP30):
     def __init__(self):
-        super(SGP30).__init__()
+        super(SGP30, self).__init__()
         #self.setup()
         self.name = "TVOC"
 
@@ -70,7 +72,7 @@ class tvoc(SGP30):
 
 class co2(SGP30):
     def __init__(self):
-        super(SGP30).__init__()
+        super(SGP30, self).__init__()
         self.setup()
         self.name = "Co2"
 
