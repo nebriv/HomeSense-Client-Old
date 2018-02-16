@@ -117,6 +117,7 @@ class Monitor(Daemon):
             self.sensor_addresses = ['0x40', '0x60', '0x39']
 
         i = 1
+        self.sensor_addresses.append("0x58")
         for sensor_address in self.config.items('SensorAddresses'):
             if sensor_address[1] in self.sensor_addresses:
                 #print(sensor_address)
@@ -170,10 +171,11 @@ class Monitor(Daemon):
             exit()
 
         for each in self.available_sensors:
-            print(each)
+            #print(each)
             data[each['sensor_name']] = each['name'] + "_name"
             data[each['sensor_data_unit_name']] = each['sensor_data_unit']
             data['token'] = self.token
+        print(data)
         r = requests.post(api_server + "/api/sensors/register/", data=data)
         if r.status_code == 201:
             print("Successfully Registered Sensor")

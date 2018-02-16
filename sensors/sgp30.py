@@ -20,7 +20,7 @@ class SGP30(Sensor):
             #print(count, data)
             self.co2 = int.from_bytes(data[0:2], byteorder='big')
             self.voc = int.from_bytes(data[3:4], byteorder='big')
-            print("Co2: %i" % self.co2)
+            #print("Co2: %i" % self.co2)
             #print("TVOC: %i" % self.voc)
             time.sleep(.6)
 
