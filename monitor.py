@@ -187,7 +187,7 @@ class Monitor(Daemon):
         self.sensors.append(temperature_humidity.Temperature())
         self.sensors.append(temperature_humidity.Humidity())
         self.sensors.append(sgp30.co2())
-        self.sensors.append(sgp30.tvoc())
+        #self.sensors.append(sgp30.tvoc())
 
 
     def collect_sensor_data(self):

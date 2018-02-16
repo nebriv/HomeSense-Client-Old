@@ -50,6 +50,7 @@ class SGP30():
 
         thread1 = Thread(target=self.run_sensor)
         thread1.start()
+        self.sensor_running = True
         time.sleep(15)
         print("Sensor Started")
         #while True:
@@ -61,7 +62,7 @@ class SGP30():
 class tvoc(SGP30):
     def __init__(self):
         super(SGP30).__init__()
-        self.setup()
+        #self.setup()
         self.name = "TVOC"
 
     def get_data(self):
@@ -70,7 +71,7 @@ class tvoc(SGP30):
 class co2(SGP30):
     def __init__(self):
         super(SGP30).__init__()
-        self.setup()
+        #self.setup()
         self.name = "Co2"
 
     def get_data(self):
