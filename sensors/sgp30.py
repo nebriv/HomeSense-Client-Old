@@ -56,16 +56,8 @@ class SGP30():
         self.sensor_running = True
         time.sleep(15)
         print("Sensor Started")
-        #return thread1
-        #while True:
-        #    print(self.co2)
-        #    time.sleep(5)
 
-    #def get_data(self)
-
-
-
-class tvoc(SGP30):
+class tvoc():
     def __init__(self, sgpObject):
         self.name = "tvoc"
         self.sgpObject =sgpObject
