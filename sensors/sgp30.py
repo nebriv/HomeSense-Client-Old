@@ -85,7 +85,7 @@ class tvoc(SGP30):
         return self.voc
 
 class co2():
-    def __init__(self):
+    def __init__(self, sgpObject):
     #     try:
     #         self.thread1
     #     except AttributeError:
@@ -96,18 +96,19 @@ class co2():
     #     #super(co2,self).__init__()
     #     #self.setup()
         self.name = "co2"
+        self.sgpObject =sgpObject
 
     def get_name(self):
         return self.name
 
-    def get_data(self, sgpObject):
-        return sgpObject.co2
+    def get_data(self):
+        return self.sgpObject.co2
 
-sensor = SGP30()
+SGPsensor = SGP30()
 
 def main():
 
-    sensor = co2()
+    sensor = co2(SGPsensor)
     print(sensor.name)
     time.sleep(5)
     for i in range(1,5):
