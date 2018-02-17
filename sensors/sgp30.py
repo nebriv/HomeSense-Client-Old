@@ -52,6 +52,7 @@ class SGP30():
         self.pi.i2c_write_device(self.handle, self.measureair)
 
         thread1 = Thread(target=self.run_sensor)
+        thread1.daemon = True
         thread1.start()
         self.sensor_running = True
         time.sleep(15)
@@ -63,10 +64,10 @@ class tvoc():
     def __init__(self):
         global SGPsensor
         if SGPsensor:
-            print("voc- it exists")
+            #print("voc- it exists")
             self.sgpObject = SGPsensor
         else:
-            print("voc- it doesn't exist")
+            #print("voc- it doesn't exist")
             SGPsensor = SGP30()
             self.sgpObject = SGPsensor
         self.name = "tvoc"
