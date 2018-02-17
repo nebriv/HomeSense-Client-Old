@@ -84,36 +84,38 @@ class tvoc(SGP30):
     def get_data(self):
         return self.voc
 
-class co2(SGP30):
+class co2():
     def __init__(self):
-        try:
-            self.thread1
-        except AttributeError:
-            print("co2 Thread Not Started")
-            self.setup()
-        else:
-            print("co2 Thread Started")
-        #super(co2,self).__init__()
-        #self.setup()
+    #     try:
+    #         self.thread1
+    #     except AttributeError:
+    #         print("co2 Thread Not Started")
+    #         self.setup()
+    #     else:
+    #         print("co2 Thread Started")
+    #     #super(co2,self).__init__()
+    #     #self.setup()
         self.name = "co2"
 
     def get_name(self):
         return self.name
 
-    def get_data(self):
-        return self.co2
+    def get_data(self, sgpObject):
+        return sgpObject.co2
+
+sensor = SGP30()
 
 def main():
 
     sensor = co2()
     print(sensor.name)
-    time.sleep(15)
+    time.sleep(5)
     for i in range(1,5):
         print(sensor.get_data())
         time.sleep(2)
-
-    sensor2 = tvoc()
-    print(sensor2.get_data())
+    #
+    # sensor2 = tvoc()
+    # print(sensor2.get_data())
 
 
 
