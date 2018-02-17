@@ -36,7 +36,7 @@ class HTU21DF(Sensor):
         self.setup()
 
     def run_sensor(self):
-        print("Running HTU21DF Sensor")
+
         handle = self.pi.i2c_open(self.bus, self.addr)  # open i2c bus
         self.pi.i2c_write_byte(handle, self.rdtemp)  # send read temp command
         time.sleep(.5)  # readings take up to 50ms, lets give it some time
@@ -62,6 +62,7 @@ class HTU21DF(Sensor):
 
 
     def setup(self):
+        print("Initializing HTU21DF Sensor")
         #print("RUNNING SETUP")
         self.pi = pigpio.pi()
 
@@ -130,7 +131,7 @@ class Humidity():
             #print("voc- it doesn't exist")
             HTU21DFSensor = HTU21DF()
             self.sensorObject = HTU21DFSensor
-        self.name = "temperature"
+        self.name = "humidity"
 
     def get_name(self):
         return self.name
