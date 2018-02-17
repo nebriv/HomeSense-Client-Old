@@ -112,6 +112,7 @@ class Monitor(Daemon):
                         if (each != "") and (each != "--"):
                             # print(each)
                             self.sensor_addresses.append("0x%s" % each)
+            self.sensor_addresses.append("0x58")
         except FileNotFoundError as err:
             print("Not supported on this OS, setting dummy vars")
             self.sensor_addresses = ['0x40', '0x60', '0x39']
