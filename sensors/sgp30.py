@@ -57,10 +57,19 @@ class SGP30():
         time.sleep(15)
         print("Sensor Started")
 
+SGPsensor = None
+
 class tvoc():
-    def __init__(self, sgpObject):
+    def __init__(self):
+        global SGPsensor
+        if SGPsensor:
+            print("voc- it exists")
+            self.sgpObject = SGPsensor
+        else:
+            print("voc- it doesn't exist")
+            SGPsensor = SGP30()
+            self.sgpObject = SGPsensor
         self.name = "tvoc"
-        self.sgpObject =sgpObject
 
     def get_name(self):
         return self.name
@@ -69,9 +78,16 @@ class tvoc():
         return self.sgpObject.voc
 
 class co2():
-    def __init__(self, sgpObject):
+    def __init__(self):
+        global SGPsensor
+        if SGPsensor:
+            print("co2- it exists")
+            self.sgpObject = SGPsensor
+        else:
+            print("co2- it doesn't exist")
+            SGPsensor = SGP30()
+            self.sgpObject = SGPsensor
         self.name = "co2"
-        self.sgpObject =sgpObject
 
     def get_name(self):
         return self.name
@@ -79,15 +95,15 @@ class co2():
     def get_data(self):
         return self.sgpObject.co2
 
-SGPsensor = SGP30()
+
 
 def main():
 
-    sensor = co2(SGPsensor)
+    sensor = co2()
     print(sensor.name)
 
 
-    sensor2 = tvoc(SGPsensor)
+    sensor2 = tvoc()
     #print(sensor2.get_data())
     time.sleep(5)
     for i in range(1,5):
