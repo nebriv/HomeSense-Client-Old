@@ -211,8 +211,9 @@ class Monitor(Daemon):
 
     def keyboard_interrupt(self, signal, frame):
         self.display.update_screen(["Shutting Down!"])
-        time.sleep(2)
+        time.sleep(5)
         self.display.clear()
+        sys.exit(0)
 
 
     def collect_sensor_data(self):
@@ -243,7 +244,7 @@ class Monitor(Daemon):
     def run(self):
         signal.signal(signal.SIGINT, self.keyboard_interrupt)
         self.display = Display()
-        self.display.dim()
+        #self.display.dim()
         self.display.update_screen(["Booting..."])
         time.sleep(2)
         self.check_for_updates()
