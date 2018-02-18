@@ -99,6 +99,7 @@ class Monitor(Daemon):
 
     def get_sensors(self):
         self.display.update_screen(["Detecting Sensors..."])
+        time.sleep(2)
         self.available_sensors = []
         try:
             p = subprocess.Popen(['i2cdetect', '-y', '1'], stdout=subprocess.PIPE, )
@@ -146,6 +147,7 @@ class Monitor(Daemon):
         for each in self.available_sensors:
             line += each['name']
         self.display.update_screen(["Found Sensors:", line])
+        time.sleep(4)
         #print(self.available_sensors)
         #exit()
 
@@ -207,6 +209,7 @@ class Monitor(Daemon):
 
 
     def collect_sensor_data(self):
+        self.display.update_screen(["Collecting Data"])
         sensor_data = {}
         for sensor in self.sensors:
             data = sensor.get_data()
@@ -219,6 +222,7 @@ class Monitor(Daemon):
 
         for each in self.available_sensors:
             each['latest_data'] = sensor_data[each['name']]
+        time.sleep(1)
 
 
     def initialize(self):
@@ -251,7 +255,7 @@ class Monitor(Daemon):
 
         while True:
             try:
-                self.display.update_screen(["Collecting Data"])
+
                 self.collect_sensor_data()
 
                 post_data = {'device_id': self.device_id, 'token': self.token}
@@ -262,6 +266,7 @@ class Monitor(Daemon):
 
                 print(post_data)
                 self.display.update_screen(["Uploading Data"])
+                time.sleep(1)
                 r = requests.post(api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
                     print("Data Uploaded")
