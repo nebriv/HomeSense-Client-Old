@@ -232,6 +232,7 @@ class Monitor(Daemon):
     def run(self):
         self.display = Display()
         self.display.update_screen(["Booting..."])
+        time.sleep(2)
         self.check_for_updates()
         self.config = ConfigParser()
         try:
@@ -268,7 +269,7 @@ class Monitor(Daemon):
                     print(r.status_code)
                     print(r.json())
 
-
+                self.display.update_screen(["Data Uploaded... Waiting"])
                 time.sleep(300)
             except Exception as err:
                 print("CAUGHT EXCEPTION: %s" % err)

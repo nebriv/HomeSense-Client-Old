@@ -42,9 +42,10 @@ class Display:
         # Load default font.
         font = ImageFont.load_default()
         # Write two lines of text.
+        line_break = 0
         for line in message:
-            draw.text((x, top),    line,  font=font, fill=255)
-            draw.text((x, top+10), line, font=font, fill=255)
+            draw.text((x, top + line_break),    line,  font=font, fill=400)
+            line_break = 10
         # Display image.
         self.disp.image(image)
         self.disp.display()
