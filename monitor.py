@@ -232,24 +232,27 @@ class Monitor(Daemon):
             self.initialize()
 
         self.initialize_sensors()
+        try:
+            while True:
+                self.collect_sensor_data()
 
-        while True:
-            self.collect_sensor_data()
-
-            post_data = {'device_id': self.device_id, 'token': self.token}
-            for each_sensor in self.available_sensors:
-                post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
-            #print(post_data)
-            print(post_data)
-            r = requests.post(api_server + '/api/data/add/', data=post_data)
-            if r.status_code == 201:
-                print("Data Uploaded")
-            else:
-                print(r.status_code)
-                print(r.json())
+                post_data = {'device_id': self.device_id, 'token': self.token}
+                for each_sensor in self.available_sensors:
+                    post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
+                #print(post_data)
+                print(post_data)
+                r = requests.post(api_server + '/api/data/add/', data=post_data)
+                if r.status_code == 201:
+                    print("Data Uploaded")
+                else:
+                    print(r.status_code)
+                    print(r.json())
 
 
-            time.sleep(300)
+                time.sleep(300)
+        except Exception as err:
+            print("CAUGHT EXCEPTION: %s" % err)
+            time.sleep(600)
 
 if __name__ == "__main__":
     daemon = Monitor('homesense.pid', verbose=2)
