@@ -7,12 +7,14 @@ import Adafruit_SSD1306
 class Display:
     RST = 24
     def __init__(self):
-        disp = Adafruit_SSD1306.SSD1306_128_32(rst=self.RST)
-        disp.begin()
-        disp.clear()
-        disp.display()
-        width = disp.width
-        height = disp.height
+        self.disp = Adafruit_SSD1306.SSD1306_128_32(rst=self.RST)
+        self.disp.begin()
+        self.disp.clear()
+        self.disp.display()
+
+    def update_screen(self, message=[]):
+        width = self.disp.width
+        height = self.disp.height
         image = Image.new('1', (width, height))
         draw = ImageDraw.Draw(image)
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
@@ -40,8 +42,10 @@ class Display:
         # Load default font.
         font = ImageFont.load_default()
         # Write two lines of text.
-        draw.text((x, top),    'Hello',  font=font, fill=255)
-        draw.text((x, top+20), 'World!', font=font, fill=255)
+        for line in message:
+            draw.text((x, top),    line,  font=font, fill=255)
+            draw.text((x, top+10), line, font=font, fill=255)
         # Display image.
-        disp.image(image)
-        disp.display()
+        self.disp.image(image)
+        self.disp.display()
+

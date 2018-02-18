@@ -87,8 +87,8 @@ class Monitor(Daemon):
     verbose = 0
 
     def check_for_updates(self):
-        d = Display()
         try:
+            self.display.update_screen(["Checking for updates"])
             print("Checking for sensor_updates")
             g = git.cmd.Git(os.getcwd())
             update_results = g.pull()
@@ -98,6 +98,7 @@ class Monitor(Daemon):
             print("CAUGHT EXCEPTION DURING UPDATES: %s" % err)
 
     def get_sensors(self):
+        self.display.update_screen(["Detecting Sensors..."])
         self.available_sensors = []
         try:
             p = subprocess.Popen(['i2cdetect', '-y', '1'], stdout=subprocess.PIPE, )
@@ -141,6 +142,10 @@ class Monitor(Daemon):
                                                'sensor_data_unit': unit,
                                                'address': sensor_address[1]})
                 i += 1
+        line = ""
+        for each in self.available_sensors:
+            line += each['name']
+        self.display.update_screen(["Found Sensors:", line])
         #print(self.available_sensors)
         #exit()
 
@@ -164,6 +169,7 @@ class Monitor(Daemon):
                 print(section, option)
 
     def register(self):
+        self.display.update_screen(["Registering with server:", api_server])
         data = {'device_id': self.device_id}
         i = 1
         r = requests.get(api_server + "/api/sensors/get_token/")
@@ -189,6 +195,7 @@ class Monitor(Daemon):
             exit()
 
     def initialize_sensors(self):
+        self.display.update_screen(["Initializing Sensors"])
         self.sensors =  []
         self.sensors.append(lux.Lux())
         self.sensors.append(pressure_altitude.Pressure())
@@ -196,6 +203,7 @@ class Monitor(Daemon):
         self.sensors.append(temperature_humidity.Humidity())
         self.sensors.append(sgp30.co2())
         self.sensors.append(sgp30.tvoc())
+        self.display.update_screen(["All sensors running"])
 
 
     def collect_sensor_data(self):
@@ -222,6 +230,8 @@ class Monitor(Daemon):
         self.save_config()
 
     def run(self):
+        self.display = Display()
+        self.display.update_screen(["Booting..."])
         self.check_for_updates()
         self.config = ConfigParser()
         try:
@@ -240,13 +250,17 @@ class Monitor(Daemon):
 
         while True:
             try:
+                self.display.update_screen(["Collecting Data"])
                 self.collect_sensor_data()
 
                 post_data = {'device_id': self.device_id, 'token': self.token}
                 for each_sensor in self.available_sensors:
                     post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
+
                 #print(post_data)
+
                 print(post_data)
+                self.display.update_screen(["Uploading Data"])
                 r = requests.post(api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
                     print("Data Uploaded")
