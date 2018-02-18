@@ -13,6 +13,12 @@ class Display:
         self.disp.clear()
         self.disp.display()
 
+    def clear(self):
+        self.disp.clear()
+
+    def dim(self):
+        self.disp.dim(True)
+
     def update_screen(self, message=[]):
         width = self.disp.width
         height = self.disp.height

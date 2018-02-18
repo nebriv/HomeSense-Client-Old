@@ -20,6 +20,7 @@ import logging
 import psutil
 import uuid
 from display import Display
+import signal
 
 api_server = "http://192.168.1.161:8000"
 sensor_id = "http://127.0.0.1:8000/api/sensors/1dbe5bb9-6ee6-46a1-86c7-cfdf274033a4/"
@@ -208,6 +209,11 @@ class Monitor(Daemon):
         self.display.update_screen(["All sensors running"])
         time.sleep(2)
 
+    def keyboard_interrupt(self, signal, frame):
+        self.display.update_screen(["Shutting Down!"])
+        time.sleep(2)
+        self.display.clear()
+
 
     def collect_sensor_data(self):
         self.display.update_screen(["Collecting Data"])
@@ -235,7 +241,9 @@ class Monitor(Daemon):
         self.save_config()
 
     def run(self):
+        signal.signal(signal.SIGINT, self.keyboard_interrupt)
         self.display = Display()
+        self.display.dim()
         self.display.update_screen(["Booting..."])
         time.sleep(2)
         self.check_for_updates()
