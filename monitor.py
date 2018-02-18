@@ -206,6 +206,7 @@ class Monitor(Daemon):
         self.sensors.append(sgp30.co2())
         self.sensors.append(sgp30.tvoc())
         self.display.update_screen(["All sensors running"])
+        time.sleep(2)
 
 
     def collect_sensor_data(self):

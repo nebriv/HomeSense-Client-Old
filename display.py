@@ -2,6 +2,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 import Adafruit_SSD1306
+from textwrap import wrap
 
 
 class Display:
@@ -43,7 +44,14 @@ class Display:
         font = ImageFont.load_default()
         # Write two lines of text.
         line_break = 0
+        formatted_lines = []
+        #line length
+        n = 100
         for line in message:
+            formatted_lines += wrap(line, 100)
+
+
+        for line in formatted_lines:
             draw.text((x, top + line_break),    line,  font=font, fill=200)
             line_break = 10
         # Display image.
