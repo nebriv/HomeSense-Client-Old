@@ -15,6 +15,7 @@ class Display:
 
     def clear(self):
         self.disp.clear()
+        self.disp.reset()
 
     def dim(self):
         self.disp.dim(True)
