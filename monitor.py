@@ -86,11 +86,14 @@ class Monitor(Daemon):
     verbose = 0
 
     def check_for_updates(self):
-        print("Checking for sensor_updates")
-        g = git.cmd.Git(os.getcwd())
-        update_results = g.pull()
-        if "Updating " in update_results:
-            restart_program()
+        try:
+            print("Checking for sensor_updates")
+            g = git.cmd.Git(os.getcwd())
+            update_results = g.pull()
+            if "Updating " in update_results:
+                restart_program()
+        except Exception as err:
+            print("CAUGHT EXCEPTION DURING UPDATES: %s" % err)
 
     def get_sensors(self):
         self.available_sensors = []
@@ -232,8 +235,9 @@ class Monitor(Daemon):
             self.initialize()
 
         self.initialize_sensors()
-        try:
-            while True:
+
+        while True:
+            try:
                 self.collect_sensor_data()
 
                 post_data = {'device_id': self.device_id, 'token': self.token}
@@ -250,9 +254,9 @@ class Monitor(Daemon):
 
 
                 time.sleep(300)
-        except Exception as err:
-            print("CAUGHT EXCEPTION: %s" % err)
-            time.sleep(600)
+            except Exception as err:
+                print("CAUGHT EXCEPTION: %s" % err)
+                time.sleep(600)
 
 if __name__ == "__main__":
     daemon = Monitor('homesense.pid', verbose=2)
