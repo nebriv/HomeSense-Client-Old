@@ -19,6 +19,7 @@ from sensors import lux, pressure_altitude, temperature_humidity, sgp30
 import logging
 import psutil
 import uuid
+from display import Display
 
 api_server = "http://192.168.1.161:8000"
 sensor_id = "http://127.0.0.1:8000/api/sensors/1dbe5bb9-6ee6-46a1-86c7-cfdf274033a4/"
@@ -86,6 +87,7 @@ class Monitor(Daemon):
     verbose = 0
 
     def check_for_updates(self):
+        d = Display()
         try:
             print("Checking for sensor_updates")
             g = git.cmd.Git(os.getcwd())

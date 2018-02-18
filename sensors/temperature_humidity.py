@@ -83,7 +83,7 @@ class HTU21DF(Sensor):
         thread1.daemon = True
         thread1.start()
         self.sensor_running = True
-        time.sleep(15)
+        time.sleep(5)
         print("Sensor Started")
 
 
