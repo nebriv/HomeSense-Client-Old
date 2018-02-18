@@ -285,7 +285,11 @@ class Monitor(Daemon):
                     print(r.json())
 
                 self.display.update_screen(["Data Uploaded...", "", "Sleeping 300 seconds"])
-                time.sleep(300)
+                timer = 300
+                while timer > 0:
+                    self.display.update_screen(["Sleeping for", "%i seconds" % timer])
+                    time.sleep(1)
+                    timer -= 1
             except Exception as err:
                 print("CAUGHT EXCEPTION: %s" % err)
                 time.sleep(600)
