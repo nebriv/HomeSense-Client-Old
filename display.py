@@ -55,6 +55,7 @@ class Display:
         n = 100
         for line in message:
             formatted_lines += wrap(line, 100)
+            print(formatted_lines)
 
 
         for line in formatted_lines:
