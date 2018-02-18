@@ -44,7 +44,7 @@ class Display:
         # Write two lines of text.
         line_break = 0
         for line in message:
-            draw.text((x, top + line_break),    line,  font=font, fill=400)
+            draw.text((x, top + line_break),    line,  font=font, fill=200)
             line_break = 10
         # Display image.
         self.disp.image(image)

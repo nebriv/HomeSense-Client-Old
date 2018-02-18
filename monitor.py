@@ -145,7 +145,7 @@ class Monitor(Daemon):
                 i += 1
         line = ""
         for each in self.available_sensors:
-            line += each['name']
+            line += "%s " % each['name']
         self.display.update_screen(["Found Sensors:", line])
         time.sleep(4)
         #print(self.available_sensors)
@@ -274,7 +274,7 @@ class Monitor(Daemon):
                     print(r.status_code)
                     print(r.json())
 
-                self.display.update_screen(["Data Uploaded... Waiting"])
+                self.display.update_screen(["Data Uploaded...", "", "Sleeping 300 seconds"])
                 time.sleep(300)
             except Exception as err:
                 print("CAUGHT EXCEPTION: %s" % err)
