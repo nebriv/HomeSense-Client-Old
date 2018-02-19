@@ -59,8 +59,8 @@ class HTU21DF(Sensor):
             # to get the compensated humidity we need to read the temperature
             time.sleep(1)
             self.humidity = ((25 - self.temperature) * -0.15) + uncomp_humidity
-            print(self.temperature)
-            print(self.humidity)
+            #print(self.temperature)
+            #print(self.humidity)
 
 
     def setup(self):
