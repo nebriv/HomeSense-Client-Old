@@ -223,6 +223,8 @@ class Monitor(Daemon):
         sensor_data = {}
         for sensor in self.sensors:
             data = sensor.get_data()
+            #print(sensor.get_name())
+            #print(data)
             if data == None:
                 sensor_data[sensor.get_name()] = None
             else:
@@ -231,6 +233,7 @@ class Monitor(Daemon):
 
         for each in self.available_sensors:
             each['latest_data'] = sensor_data[each['name']]
+
         time.sleep(1)
 
 
@@ -279,7 +282,8 @@ class Monitor(Daemon):
                 self.collect_sensor_data()
 
                 post_data = {'device_id': self.device_id, 'token': self.token}
-
+                for each_sensor in self.available_sensors:
+                    post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
                 #print(post_data)
 
                 print(post_data)
