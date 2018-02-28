@@ -222,8 +222,9 @@ class Monitor(Daemon):
         self.display.update_screen(["Collecting Data"])
         sensor_data = {}
         for sensor in self.sensors:
+            print(sensor.get_name())
             data = sensor.get_data()
-
+            print(data)
             if data == None:
                 sensor_data[sensor.get_name()] = None
             else:
