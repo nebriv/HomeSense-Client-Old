@@ -277,7 +277,7 @@ class Monitor(Daemon):
                 print(post_data)
                 self.display.update_screen(["Uploading Data"])
                 time.sleep(1)
-                r = requests.post(api_server + '/api/data/add/', data=post_data)
+                r = requests.post(self.api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
                     print("Data Uploaded")
                 else:
