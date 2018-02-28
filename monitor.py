@@ -269,7 +269,8 @@ class Monitor(Daemon):
             self.initialize()
 
         self.initialize_sensors()
-
+        print(self.available_sensors)
+        print(self.sensors)
         while True:
             try:
 
