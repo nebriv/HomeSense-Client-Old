@@ -278,8 +278,10 @@ class Monitor(Daemon):
                 self.collect_sensor_data()
 
                 post_data = {'device_id': self.device_id, 'token': self.token}
+                print(self.available_sensors)
                 for each_sensor in self.available_sensors:
                     post_data[each_sensor['sensor_name'] + "_data"] = each_sensor['latest_data']
+                    print(each_sensor['sensor_name'], each_sensor['latest_data'])
 
                 #print(post_data)
 
