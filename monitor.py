@@ -264,6 +264,9 @@ class Monitor(Daemon):
         except IOError as err:
             print("Config File Not Found.")
             self.config.read('.homesense_init.conf')
+            self.api_server = self.config.get('Server', 'server')
+            if self.config.has_option('Server', 'dev_server'):
+                self.dev_api_server = self.config.get('Server', 'dev_server')
             self.get_sensors()
             self.initialize()
 
