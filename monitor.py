@@ -171,10 +171,12 @@ class Monitor(Daemon):
                 print(section, option)
 
     def register(self):
-        self.display.update_screen(["Registering with server:", api_server])
+        self.display.update_screen(["Registering with server:", self.api_server])
         data = {'device_id': self.device_id}
         i = 1
-        r = requests.get(api_server + "/api/sensors/get_token/")
+        if self.dev_api_server:
+            r = requests.get(self.api_server + "/api/sensors/get_token/")
+        r = requests.get(self.api_server + "/api/sensors/get_token/")
 
         if r.status_code == 200:
             self.token = r.json()['token']
@@ -188,8 +190,9 @@ class Monitor(Daemon):
             data[each['sensor_name'] + "_name"] = each['name']
             data[each['sensor_data_unit_name']] = each['sensor_data_unit']
             data['token'] = self.token
-
-        r = requests.post(api_server + "/api/sensors/register/", data=data)
+        if self.dev_api_server:
+            r = requests.post(self.dev_api_server + "/api/sensors/register/", data=data)
+        r = requests.post(self.api_server + "/api/sensors/register/", data=data)
         if r.status_code == 201:
             print("Successfully Registered Sensor")
         else:
@@ -254,6 +257,10 @@ class Monitor(Daemon):
                 self.token = self.config.get('Server', 'Token')
                 self.device_id = self.config.get('Server', 'Device_id')
                 self.api_server = self.config.get('Server', 'server')
+                if self.config.has_option('Server', 'dev_server'):
+                    self.dev_api_server = self.config.get('Server', 'dev_server')
+                else:
+                    self.dev_api_server = None
                 self.get_sensors()
         except IOError as err:
             print("Config File Not Found.")
@@ -277,6 +284,8 @@ class Monitor(Daemon):
                 print(post_data)
                 self.display.update_screen(["Uploading Data"])
                 time.sleep(1)
+                if self.dev_api_server:
+                    r = requests.post(self.dev_api_server + '/api/data/add/', data=post_data)
                 r = requests.post(self.api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
                     print("Data Uploaded")
