@@ -22,8 +22,7 @@ import uuid
 from display import Display
 import signal
 
-api_server = "http://192.168.1.161:8000"
-sensor_id = "http://127.0.0.1:8000/api/sensors/1dbe5bb9-6ee6-46a1-86c7-cfdf274033a4/"
+#api_server = "http://192.168.1.161:8000"
 
 def int_to_en(num):
     d = { 0 : 'zero', 1 : 'one', 2 : 'two', 3 : 'three', 4 : 'four', 5 : 'five',
@@ -254,6 +253,7 @@ class Monitor(Daemon):
                 self.config.read_file(f)
                 self.token = self.config.get('Server', 'Token')
                 self.device_id = self.config.get('Server', 'Device_id')
+                self.api_server = self.config.get('Server', 'server')
                 self.get_sensors()
         except IOError as err:
             print("Config File Not Found.")
