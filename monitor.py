@@ -175,7 +175,7 @@ class Monitor(Daemon):
         data = {'device_id': self.device_id}
         i = 1
         if self.dev_api_server:
-            r = requests.get(self.api_server + "/api/sensors/get_token/")
+            d = requests.get(self.api_server + "/api/sensors/get_token/")
         r = requests.get(self.api_server + "/api/sensors/get_token/")
 
         if r.status_code == 200:
@@ -191,7 +191,7 @@ class Monitor(Daemon):
             data[each['sensor_data_unit_name']] = each['sensor_data_unit']
             data['token'] = self.token
         if self.dev_api_server:
-            r = requests.post(self.dev_api_server + "/api/sensors/register/", data=data)
+            d = requests.post(self.dev_api_server + "/api/sensors/register/", data=data)
         r = requests.post(self.api_server + "/api/sensors/register/", data=data)
         if r.status_code == 201:
             print("Successfully Registered Sensor")
@@ -286,7 +286,7 @@ class Monitor(Daemon):
                 self.display.update_screen(["Uploading Data"])
                 time.sleep(1)
                 if self.dev_api_server:
-                    r = requests.post(self.dev_api_server + '/api/data/add/', data=post_data)
+                    d = requests.post(self.dev_api_server + '/api/data/add/', data=post_data)
                 r = requests.post(self.api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
                     print("Data Uploaded")
