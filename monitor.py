@@ -290,7 +290,10 @@ class Monitor(Daemon):
                 self.display.update_screen(["Uploading Data"])
                 time.sleep(1)
                 if self.dev_api_server:
-                    d = requests.post(self.dev_api_server + '/api/data/add/', data=post_data)
+                    try:
+                        d = requests.post(self.dev_api_server + '/api/data/add/', data=post_data)
+                    except Exception as err:
+                        print("CAUGHT EXCEPTION: %s" % err)
                 r = requests.post(self.api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
                     print("Data Uploaded")
