@@ -21,6 +21,9 @@ import psutil
 import uuid
 from display import Display
 import signal
+import logging
+
+logger = logging.getLogger(__name__)
 
 #api_server = "http://192.168.1.161:8000"
 
@@ -71,14 +74,14 @@ def restart_program():
     """Restarts the current program, with file objects and descriptors
        cleanup
     """
-
+    logger.info("Restarting to apply updates")
     print("Restarting to apply updates")
     try:
         p = psutil.Process(os.getpid())
         for handler in p.get_open_files() + p.connections():
             os.close(handler.fd)
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
 
     python = sys.executable
     os.execl(python, python, *sys.argv)
@@ -89,15 +92,18 @@ class Monitor(Daemon):
     def check_for_updates(self):
         try:
             self.display.update_screen(["Checking for updates"])
+            logger.info("Checking for sensor updates")
             print("Checking for sensor_updates")
             g = git.cmd.Git(os.getcwd())
             update_results = g.pull()
             if "Updating " in update_results:
                 restart_program()
         except Exception as err:
-            print("CAUGHT EXCEPTION DURING UPDATES: %s" % err)
+            logger.error(err)
+            #print("CAUGHT EXCEPTION DURING UPDATES: %s" % err)
 
     def get_sensors(self):
+        logger.info("Detecting sensors")
         self.display.update_screen(["Detecting Sensors..."])
         time.sleep(2)
         self.available_sensors = []
@@ -121,6 +127,7 @@ class Monitor(Daemon):
                             self.sensor_addresses.append("0x%s" % each)
             self.sensor_addresses.append("0x58")
         except FileNotFoundError as err:
+            logger.warning("i2cdetect not supported, setting dummy vars")
             print("Not supported on this OS, setting dummy vars")
             self.sensor_addresses = ['0x40', '0x60', '0x39']
 
@@ -134,6 +141,7 @@ class Monitor(Daemon):
                     #print(unit)
                 except Exception as e:
                     if "No option" in str(e):
+                        logger.info("No unit for %s sensor" % sensor_address[1])
                         print("No unit set")
                         unit = "Unknown"
 
@@ -149,6 +157,7 @@ class Monitor(Daemon):
         self.display.update_screen(["Found Sensors:", line])
         time.sleep(4)
         #print(self.available_sensors)
+        logger.debug("Found sensors: %s" % self.available_sensors)
         #exit()
 
 
@@ -171,6 +180,7 @@ class Monitor(Daemon):
                 print(section, option)
 
     def register(self):
+        self.info("Registering with server")
         self.display.update_screen(["Registering with server:", self.api_server])
         data = {'device_id': self.device_id}
         i = 1
@@ -200,6 +210,7 @@ class Monitor(Daemon):
             exit()
 
     def initialize_sensors(self):
+        logger.info("Initializing Sensors")
         self.display.update_screen(["Initializing Sensors"])
         self.sensors =  []
         self.sensors.append(lux.Lux())
@@ -212,6 +223,7 @@ class Monitor(Daemon):
         time.sleep(2)
 
     def keyboard_interrupt(self, signal, frame):
+        logger.info("Keyboard Interrupt - Shutting Down")
         self.display.update_screen(["Shutting Down!"])
         time.sleep(5)
         self.display.clear()
@@ -219,6 +231,7 @@ class Monitor(Daemon):
 
 
     def collect_sensor_data(self):
+        logger.info("Collecting sensor data")
         self.display.update_screen(["Collecting Data"])
         sensor_data = {}
         for sensor in self.sensors:
@@ -238,8 +251,10 @@ class Monitor(Daemon):
 
 
     def initialize(self):
+        logger.info("Initializing HomeSense Monitor")
         print("Initializing HomeSense Monitor...")
         self.generate_device_id()
+        logger.info("Device ID: %s" % self.device_id)
         print("Device ID: %s" % self.device_id)
         self.config.set('Server', 'device_id', str(self.device_id))
         self.register()
@@ -254,6 +269,7 @@ class Monitor(Daemon):
         self.check_for_updates()
         self.config = ConfigParser()
         try:
+            logger.info("Trying to read homesense.conf")
             with open('homesense.conf') as f:
                 self.config.read_file(f)
                 self.token = self.config.get('Server', 'Token')
@@ -265,6 +281,7 @@ class Monitor(Daemon):
                     self.dev_api_server = None
                 self.get_sensors()
         except IOError as err:
+            logger.warning("Config file not found")
             print("Config File Not Found.")
             self.config.read('.homesense_init.conf')
             self.api_server = self.config.get('Server', 'server')
@@ -274,8 +291,6 @@ class Monitor(Daemon):
             self.initialize()
 
         self.initialize_sensors()
-        print(self.available_sensors)
-        print(self.sensors)
         while True:
             try:
 
@@ -287,12 +302,14 @@ class Monitor(Daemon):
                 #print(post_data)
 
                 print(post_data)
+                logger.info("Uploading sensor data")
                 self.display.update_screen(["Uploading Data"])
                 time.sleep(1)
                 if self.dev_api_server:
                     try:
                         d = requests.post(self.dev_api_server + '/api/data/add/', data=post_data)
                     except Exception as err:
+                        logger.warning(err)
                         print("CAUGHT EXCEPTION: %s" % err)
                 r = requests.post(self.api_server + '/api/data/add/', data=post_data)
                 if r.status_code == 201:
@@ -309,6 +326,7 @@ class Monitor(Daemon):
                     timer -= 1
             except Exception as err:
                 print("CAUGHT EXCEPTION: %s" % err)
+                logger.warning(err)
                 time.sleep(600)
 
 if __name__ == "__main__":
