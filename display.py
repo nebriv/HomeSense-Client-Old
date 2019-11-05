@@ -79,5 +79,5 @@ class Display:
             self.disp.image(image)
             self.disp.display()
         else:
-            logger
+            logger.error("Import failed. Missing modules.")
             pass
