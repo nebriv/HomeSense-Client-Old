@@ -52,3 +52,4 @@ venv
 homesense.conf
 
 __pycache__
+homesense.log
