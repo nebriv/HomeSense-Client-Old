@@ -137,7 +137,7 @@ class Monitor(Daemon):
                             # print(each)
                             self.sensor_addresses.append("0x%s" % each)
             self.sensor_addresses.append("0x58")
-        except FileNotFoundError as err:
+        except Exception as err:
             logger.warning("i2cdetect not supported, setting dummy vars")
             #print("Not supported on this OS, setting dummy vars")
             self.sensor_addresses = ['0x40', '0x60', '0x39']
